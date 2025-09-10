@@ -19,18 +19,6 @@ HEADERS = {
 }
 
 
-def beautify():
-    """提取目录中的url"""
-    repose = requests.get(URL, headers=HEADERS).text
-    soup = BeautifulSoup(repose, 'html.parser')
-    divs = soup.find('div', class_='book_last')
-    title = soup.title.text if soup.title.text else '无标题'
-    url_paths = []
-    for a in divs.find_all('a'):
-        if a.get('href').endswith('.html'):
-            url_path = urljoin(URL, a.get('href'))
-            url_paths.append(url_path)
-    return url_paths, title
 
 
 def novel_write_file(title: str, content: str, novel_id) -> None:
@@ -53,9 +41,8 @@ class AsyncNovelCrawler:
             book_urls: list[str],
             novel_id: str,
             headers=None,
-            max_concurrency: int = 10,
+            max_concurrency: int = 5,
             timeout: float = 6.1,
-            batch_size: int = 20
     ):
         self.base_url = base_url
         self.book_urls = book_urls
@@ -65,7 +52,6 @@ class AsyncNovelCrawler:
         self.timeout = timeout
         self.max_concurrency = max_concurrency
         self.semaphore = asyncio.Semaphore(max_concurrency)
-        self.batch_size = batch_size
         self.chain = set()
         self.logger = logging.getLogger(self.__class__.__name__)
         if not self.logger.handlers:
