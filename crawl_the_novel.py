@@ -35,11 +35,12 @@ def beautify():
 
 def novel_write_file(title: str, content: str, novel_id) -> None:
     """写入文件"""
-    base_dir = 'D:\\'
+    file_type = f'{title}.txt'
+    base_dir = os.path.join(os.path.dirname(__file__), 'novels')
     novel_dir = os.path.join(base_dir, novel_id)
     if not os.path.exists(novel_dir):
         os.makedirs(novel_dir)
-    with open(os.path.join(novel_dir, f'{title}.txt'), 'a', encoding='utf-8') as f:
+    with open(os.path.join(novel_dir, file_type), 'a', encoding='utf-8') as f:
         f.write(content)
 
 
@@ -194,17 +195,3 @@ class AsyncNovelCrawler:
                 self.logger.error(fut)
 
 
-async def main(base_url, book_list_urls: list[str], novel_id: str) -> None:
-    async with AsyncNovelCrawler(
-            base_url=base_url,
-            book_urls=book_list_urls,
-            max_concurrency=20,
-            batch_size=50,
-            novel_id=novel_id
-    ) as crawler:
-        await crawler.crawl()
-
-# if __name__ == '__main__':
-#     new_book_list_urls, title = beautify()
-#
-#     asyncio.run(main(URL, new_book_list_urls[:20], novel_id=title))
